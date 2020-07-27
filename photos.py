@@ -1,9 +1,6 @@
 """
 This module extracts and does some simple cleanup of Google Photos takeout
 archives.
-
-WARNING: This module assumes all JSON metadata files aren't useful and deletes
-them by default.
 """
 
 import argparse
@@ -64,7 +61,6 @@ def _delete_metadata_files(takeout_dir):
 
 def _clean_up(takeout_dir, delete_archives=False):
     """Cleans up extra files and the compressed archives."""
-    _delete_metadata_files(takeout_dir)
     if delete_archives:
         takeout_archives = _list_takeout_archives(takeout_dir)
         for archive in takeout_archives:
