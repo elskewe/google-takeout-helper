@@ -7,6 +7,8 @@ import argparse
 import distutils.core
 import fnmatch
 import os
+import platform
+import subprocess
 # from wand.image import Image
 import zipfile
 
@@ -58,7 +60,7 @@ def _delete_metadata_files(takeout_dir):
             os.remove(metadata_file)
 
 
-def _clean_up(takeout_dir, delete_archives=False):
+def _clean_up(takeout_dir, photos_dir, delete_archives=False):
     """Cleans up extra files and the compressed archives."""
     if delete_archives:
         takeout_archives = _list_takeout_archives(takeout_dir)
@@ -67,6 +69,29 @@ def _clean_up(takeout_dir, delete_archives=False):
             os.remove(archive)
     else:
         print('Not deleting archives.')
+
+    # Replace duplicate files with symlinks
+    print('Replacing duplicate files with symlinks')
+    rdfind_call = 'rdfind -checksum sha1 -makesymlinks true'
+    if platform.system() == 'Windows':
+        photos_path_wsl = (subprocess.run('wsl wslpath -a "' + os.path.join(
+            photos_dir, 'Photos') + '"', capture_output=True, universal_newlines=True)
+            .stdout  # get output
+            .rstrip('\n'))  # strip trailing newline
+        albums_path_wsl = (subprocess.run(
+            'wsl wslpath -a "' + os.path.join(photos_dir, 'Albums') + '"', capture_output=True, universal_newlines=True)
+            .stdout
+            .rstrip('\n'))
+        rdfind_call = ('wsl ' + rdfind_call + ' "' +
+                       photos_path_wsl + '" "' + albums_path_wsl + '"')
+    elif platform.system() == 'Linux':
+        rdfind_call = ('rdfind -checksum sha1 -makesymlinks true "'
+                       + os.path.normpath(os.path.join(photos_dir, 'Photos'))
+                       + '" "' + os.path.normpath(os.path.join(photos_dir, 'Albums')) + '"')
+    else:
+        print('OS not supported for duplicate file replacement')
+        return
+    subprocess.run(rdfind_call)
 
 
 def organize_photos_takeout(takeout_dir, photos_dir):
