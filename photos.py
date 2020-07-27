@@ -9,6 +9,7 @@ import fnmatch
 import os
 import platform
 import subprocess
+import re
 # from wand.image import Image
 import zipfile
 
@@ -27,12 +28,31 @@ def _list_takeout_archives(takeout_dir):
     return dir_files
 
 
-def _unzip_archives(takeout_dir):
-    """Extracts all archives to the archive directory."""
+def _unzip_photos(takeout_dir, photos_dir, mode='photos'):
+    """Extracts all archives to the destination directory.
+
+    `mode` can be either 'photos' (default) or 'albums'. The former extracts the dated folders, the latter the rest, assuming they are all albums.
+    """
+    pattern = re.compile(r'^Takeout/Google Photos/\d{4}-[01]\d-[0-3]\d.*')
+
     for archive in _list_takeout_archives(takeout_dir):
         print('unzipping: ', archive)
         with zipfile.ZipFile(archive, 'r') as zip_ref:
-            zip_ref.extractall(takeout_dir)
+            # print(zip_ref.namelist())
+            for file in zip_ref.infolist():
+                # determine whether the current file matches the mode
+                if mode == 'photos':
+                    isValid = pattern.match(file.filename)
+                elif mode == 'albums':
+                    isValid = not pattern.match(file.filename)
+
+                # extract file
+                if isValid:
+                    # remove the Takeout/Google Photos part from the target directory
+                    file.filename = os.path.relpath(
+                        file.filename, 'Takeout/Google Photos')
+                    zip_ref.extract(file, os.path.join(
+                        photos_dir, mode.title()))
 
 # def _convert_heic_files(takeout_dir):
 #     """Convert HEIC files to JPG in place and keep the original."""
