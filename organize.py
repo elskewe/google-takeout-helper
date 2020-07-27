@@ -10,6 +10,7 @@ import os
 import mail
 import photos
 
+
 def dir_path(string):
     """Determines if the argument is an existing directory."""
     if os.path.isdir(string):
@@ -17,6 +18,7 @@ def dir_path(string):
     else:
         raise argparse.ArgumentTypeError(
             'Path "' + string + '" is not a directory.')
+
 
 PARSER = argparse.ArgumentParser(description=('Tool for processing and '
                                               'organizing Google takeout '
@@ -52,10 +54,12 @@ def _maybe_extract_email_attachments(mbox_file_path):
         print('Invalid (or no) .mbox path specified. Not extracting email '
               'attachments.')
 
+
 def main():
     args = PARSER.parse_args()
     _maybe_organize_photos_takeout(args.photos_dir)
     _maybe_extract_email_attachments(args.mbox_file)
+
 
 if __name__ == '__main__':
     main()
