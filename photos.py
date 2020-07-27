@@ -90,21 +90,12 @@ def _clean_up(takeout_dir, photos_dir, delete_archives=False):
     else:
         print('Not deleting archives.')
 
-    # Replace duplicate files with symlinks
-    print('Replacing duplicate files with symlinks')
-    rdfind_call = 'rdfind -checksum sha1 -makesymlinks true'
+    # Replace duplicate files with symlinks (Unix) or hardlinks (Windows)
     if platform.system() == 'Windows':
-        photos_path_wsl = (subprocess.run('wsl wslpath -a "' + os.path.join(
-            photos_dir, 'Photos') + '"', capture_output=True, universal_newlines=True)
-            .stdout  # get output
-            .rstrip('\n'))  # strip trailing newline
-        albums_path_wsl = (subprocess.run(
-            'wsl wslpath -a "' + os.path.join(photos_dir, 'Albums') + '"', capture_output=True, universal_newlines=True)
-            .stdout
-            .rstrip('\n'))
-        rdfind_call = ('wsl ' + rdfind_call + ' "' +
-                       photos_path_wsl + '" "' + albums_path_wsl + '"')
+        print('Replacing duplicate files with hardlinks')
+        rdfind_call = ('jdupes --linkhard -R ' + os.path.join(photos_dir, 'Photos') + '" "' + os.path.join(photos_dir, 'Albums') + '"')
     elif platform.system() == 'Linux':
+        print('Replacing duplicate files with symlinks')
         rdfind_call = ('rdfind -checksum sha1 -makesymlinks true "'
                        + os.path.normpath(os.path.join(photos_dir, 'Photos'))
                        + '" "' + os.path.normpath(os.path.join(photos_dir, 'Albums')) + '"')
