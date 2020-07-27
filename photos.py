@@ -7,7 +7,7 @@ import argparse
 import distutils.core
 import fnmatch
 import os
-from wand.image import Image
+# from wand.image import Image
 import zipfile
 
 
@@ -32,20 +32,19 @@ def _unzip_archives(takeout_dir):
         with zipfile.ZipFile(archive, 'r') as zip_ref:
             zip_ref.extractall(takeout_dir)
 
+# def _convert_heic_files(takeout_dir):
+#     """Convert HEIC files to JPG in place and keep the original."""
+#     for dirpath, _, filenames in os.walk(os.path.join(takeout_dir,
+#                                                       *PHOTOS_SUBDIR)):
+#         heic_files = [os.path.join(dirpath, name) for name in filenames if
+#                       name.endswith('.HEIC')]
 
-def _convert_heic_files(takeout_dir):
-    """Convert HEIC files to JPG in place and keep the original."""
-    for dirpath, _, filenames in os.walk(os.path.join(takeout_dir,
-                                                      *PHOTOS_SUBDIR)):
-        heic_files = [os.path.join(dirpath, name) for name in filenames if
-                      name.endswith('.HEIC')]
-
-        for heic_file in heic_files:
-            with Image(filename=heic_file) as original:
-                with original.convert('jpeg') as converted:
-                    jpg_file = os.path.splitext(heic_file)[0] + '.jpg'
-                    print('Saved converted JPG: ', jpg_file)
-                    converted.save(filename=jpg_file)
+#         for heic_file in heic_files:
+#             with Image(filename=heic_file) as original:
+#                 with original.convert('jpeg') as converted:
+#                     jpg_file = os.path.splitext(heic_file)[0] + '.jpg'
+#                     print('Saved converted JPG: ', jpg_file)
+#                     converted.save(filename=jpg_file)
 
 
 def _delete_metadata_files(takeout_dir):
@@ -73,10 +72,10 @@ def _clean_up(takeout_dir, delete_archives=False):
 def organize_photos_takeout(takeout_dir, photos_dir):
     _unzip_archives(takeout_dir)
 
-    answer = input('Convert HEIC to JPG and keep original? y/n: ')
-    answer = distutils.util.strtobool(answer)
-    if answer:
-        _convert_heic_files(takeout_dir)
+    # answer = input('Convert HEIC to JPG and keep original? y/n: ')
+    # answer = distutils.util.strtobool(answer)
+    # if answer:
+    #     _convert_heic_files(takeout_dir)
 
     # Clean up.
     answer = input('Delete all takeout archives? y/n: ')
