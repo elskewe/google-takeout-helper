@@ -23,24 +23,28 @@ def dir_path(string):
 PARSER = argparse.ArgumentParser(description=('Tool for processing and '
                                               'organizing Google takeout '
                                               'data.'))
-PARSER.add_argument('--photos_dir', type=dir_path,
+PARSER.add_argument('--takeout_dir', type=dir_path,
                     help='The directory containing Google Photos takeout '
                     'archives (i.e. one or multiple zip file)')
+PARSER.add_argument('--photos_dir', type=dir_path,
+                    help='The destination directory for the Google Photos takeout. Default: set to ''--takeout_dir''')
 PARSER.add_argument('--mbox_file',
                     help='The mbox file with Gmail takeout data.')
 
 
-def _maybe_organize_photos_takeout(takeout_dir):
+def _maybe_organize_photos_takeout(takeout_dir, photos_dir):
     if not takeout_dir:
         print('Invalid (or no) Photos takeout archive directory specified. Not '
               'extracting photos from archives.')
         return
     else:
+        if not photos_dir:
+            photos_dir = takeout_dir
         organize_photos = input('Organize Photos takeout archives? y/n: ')
         organize_photos = distutils.util.strtobool(organize_photos)
         if not organize_photos:
             return
-    photos.organize_photos_takeout(takeout_dir)
+    photos.organize_photos_takeout(takeout_dir, photos_dir)
 
 
 def _maybe_extract_email_attachments(mbox_file_path):
@@ -57,7 +61,7 @@ def _maybe_extract_email_attachments(mbox_file_path):
 
 def main():
     args = PARSER.parse_args()
-    _maybe_organize_photos_takeout(args.photos_dir)
+    _maybe_organize_photos_takeout(args.takeout_dir, args.photos_dir)
     _maybe_extract_email_attachments(args.mbox_file)
 
 

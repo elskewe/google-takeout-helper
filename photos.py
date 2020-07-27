@@ -74,7 +74,7 @@ def _clean_up(takeout_dir, delete_archives=False):
         print('Not deleting archives.')
 
 
-def organize_photos_takeout(takeout_dir):
+def organize_photos_takeout(takeout_dir, photos_dir):
     _unzip_archives(takeout_dir)
 
     answer = input('Convert HEIC to JPG and keep original? y/n: ')
@@ -85,4 +85,4 @@ def organize_photos_takeout(takeout_dir):
     # Clean up.
     answer = input('Delete all takeout archives? y/n: ')
     answer = distutils.util.strtobool(answer)
-    _clean_up(takeout_dir, answer)
+    _clean_up(takeout_dir, photos_dir, answer)
