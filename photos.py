@@ -115,7 +115,10 @@ def _clean_up(takeout_dir, photos_dir, delete_archives=False):
 
 
 def organize_photos_takeout(takeout_dir, photos_dir):
-    _unzip_archives(takeout_dir)
+    print('Unzipping photos')
+    _unzip_photos(takeout_dir, photos_dir, 'photos')
+    print('Unzipping albums')
+    _unzip_photos(takeout_dir, photos_dir, 'albums')
 
     # answer = input('Convert HEIC to JPG and keep original? y/n: ')
     # answer = distutils.util.strtobool(answer)
