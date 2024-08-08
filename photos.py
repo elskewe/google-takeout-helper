@@ -3,7 +3,6 @@ This module extracts and does some simple cleanup of Google Photos takeout
 archives.
 """
 
-import argparse
 import distutils.core
 import fnmatch
 import os
