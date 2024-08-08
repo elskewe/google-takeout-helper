@@ -93,7 +93,7 @@ def _clean_up(takeout_dir, photos_dir, delete_archives=False):
     # Replace duplicate files with symlinks (Unix) or hardlinks (Windows)
     if platform.system() == 'Windows':
         print('Replacing duplicate files with hardlinks')
-        rdfind_call = ('jdupes --linkhard -R "' + os.path.join(photos_dir, 'Photos') + '" "' + os.path.join(photos_dir, 'Albums') + '"')
+        rdfind_call = ('jdupes --link-hard --recurse "' + os.path.join(photos_dir, 'Photos') + '" "' + os.path.join(photos_dir, 'Albums') + '"')
     elif platform.system() == 'Linux':
         print('Replacing duplicate files with symlinks')
         rdfind_call = ('rdfind -checksum sha1 -makesymlinks true "'
