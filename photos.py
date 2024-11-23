@@ -41,12 +41,12 @@ def _unzip_photos(takeout_dir, photos_dir, mode='photos'):
             for file in zip_ref.infolist():
                 # determine whether the current file matches the mode
                 if mode == 'photos':
-                    isValid = pattern.match(file.filename)
+                    is_valid = pattern.match(file.filename)
                 elif mode == 'albums':
-                    isValid = not pattern.match(file.filename)
+                    is_valid = not pattern.match(file.filename)
 
                 # extract file
-                if isValid:
+                if is_valid:
                     # remove the Takeout/Google Photos part from the target directory
                     file.filename = os.path.relpath(
                         file.filename, 'Takeout/Google Photos')
