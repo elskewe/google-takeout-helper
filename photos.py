@@ -53,31 +53,6 @@ def _unzip_photos(takeout_dir, photos_dir, mode='photos'):
                     zip_ref.extract(file, os.path.join(
                         photos_dir, mode.title()))
 
-# def _convert_heic_files(takeout_dir):
-#     """Convert HEIC files to JPG in place and keep the original."""
-#     for dirpath, _, filenames in os.walk(os.path.join(takeout_dir,
-#                                                       *PHOTOS_SUBDIR)):
-#         heic_files = [os.path.join(dirpath, name) for name in filenames if
-#                       name.endswith('.HEIC')]
-
-#         for heic_file in heic_files:
-#             with Image(filename=heic_file) as original:
-#                 with original.convert('jpeg') as converted:
-#                     jpg_file = os.path.splitext(heic_file)[0] + '.jpg'
-#                     print('Saved converted JPG: ', jpg_file)
-#                     converted.save(filename=jpg_file)
-
-
-def _delete_metadata_files(takeout_dir):
-    """Deletes all metadata files in the Photos data."""
-    for dirpath, _, filenames in os.walk(os.path.join(takeout_dir,
-                                                      *PHOTOS_SUBDIR)):
-        metadata_files = [os.path.join(dirpath, name) for name in filenames if
-                          name.endswith('.json')]
-
-        for metadata_file in metadata_files:
-            os.remove(metadata_file)
-
 
 def _clean_up(takeout_dir, photos_dir, delete_archives=False):
     """Cleans up extra files and the compressed archives."""
@@ -109,11 +84,6 @@ def organize_photos_takeout(takeout_dir, photos_dir):
     _unzip_photos(takeout_dir, photos_dir, 'photos')
     print('Unzipping albums')
     _unzip_photos(takeout_dir, photos_dir, 'albums')
-
-    # answer = input('Convert HEIC to JPG and keep original? y/n: ')
-    # answer = distutils.util.strtobool(answer)
-    # if answer:
-    #     _convert_heic_files(takeout_dir)
 
     # Clean up.
     answer = input('Delete all takeout archives? y/n: ')
