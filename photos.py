@@ -18,7 +18,7 @@ import zipfile
 PHOTOS_SUBDIR = ('Takeout', 'Google Photos')
 
 
-def _list_takeout_archives(takeout_dir):
+def _list_takeout_archives(takeout_dir: str) -> list[str]:
     """Lists the full path of all Google Takeout archives."""
     dir_files = []
     for filename in os.listdir(takeout_dir):
@@ -27,7 +27,7 @@ def _list_takeout_archives(takeout_dir):
     return dir_files
 
 
-def _unzip_photos(takeout_dir, photos_dir, mode='photos'):
+def _unzip_photos(takeout_dir: str, photos_dir: str, mode='photos'):
     """Extracts all archives to the destination directory.
 
     `mode` can be either 'photos' (default) or 'albums'. The former extracts the dated folders, the
@@ -82,7 +82,7 @@ def _clean_up(takeout_dir, photos_dir, delete_archives=False):
     subprocess.run(rdfind_call, check=True)
 
 
-def organize_photos_takeout(takeout_dir, photos_dir):
+def organize_photos_takeout(takeout_dir: str, photos_dir: str):
     print('Unzipping photos')
     _unzip_photos(takeout_dir, photos_dir, 'photos')
     print('Unzipping albums')
