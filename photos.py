@@ -76,7 +76,7 @@ def _clean_up(takeout_dir, photos_dir, delete_archives=False):
     else:
         print('OS not supported for duplicate file replacement')
         return
-    subprocess.run(rdfind_call)
+    subprocess.run(rdfind_call, check=True)
 
 
 def organize_photos_takeout(takeout_dir, photos_dir):
