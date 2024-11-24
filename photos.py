@@ -45,6 +45,8 @@ def _unzip_photos(takeout_dir, photos_dir, mode='photos'):
                     is_valid = pattern.match(file.filename)
                 elif mode == 'albums':
                     is_valid = not pattern.match(file.filename)
+                else:
+                    raise ValueError('mode must be either "photos" or "albums"')
 
                 # extract file
                 if is_valid:
