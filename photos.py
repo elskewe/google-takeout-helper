@@ -11,6 +11,7 @@ import subprocess
 import re
 # from wand.image import Image
 import zipfile
+from rich.progress import Progress, DownloadColumn, TransferSpeedColumn
 
 
 # Path to the Google Photos data directory in the extracted takeout data.
@@ -35,26 +36,37 @@ def _unzip_photos(takeout_dir: str, photos_dir: str, mode='photos'):
     """
     pattern = re.compile(r'^Takeout/Google Photos/Photos from \d{4}')
 
-    for archive in _list_takeout_archives(takeout_dir):
-        print('unzipping: ', archive)
-        with zipfile.ZipFile(archive, 'r') as zip_ref:
-            # print(zip_ref.namelist())
-            for file in zip_ref.infolist():
-                # determine whether the current file matches the mode
-                if mode == 'photos':
-                    is_valid = pattern.match(file.filename)
-                elif mode == 'albums':
-                    is_valid = not pattern.match(file.filename)
-                else:
-                    raise ValueError('mode must be either "photos" or "albums"')
+    with Progress(*Progress.get_default_columns(), DownloadColumn(), TransferSpeedColumn()) as progress:
+        takeout_archives = _list_takeout_archives(takeout_dir)
+        total_size = sum(os.path.getsize(archive) for archive in takeout_archives)
 
-                # extract file
-                if is_valid:
-                    # remove the Takeout/Google Photos part from the target directory
-                    file.filename = os.path.relpath(
-                        file.filename, 'Takeout/Google Photos')
-                    zip_ref.extract(file, os.path.join(
-                        photos_dir, mode.title()))
+        archives_task = progress.add_task(f'Unzipping {mode}', total=total_size)
+        unzipping_task = progress.add_task("Unzipping", total=None)
+
+        for archive in takeout_archives:
+            with zipfile.ZipFile(archive, 'r') as zip_ref:
+                current_file_total_size = sum(f.file_size for f in zip_ref.infolist())
+                # update unzipping task with current filename
+                progress.reset(unzipping_task, description=f"Unzipping {archive}", total=current_file_total_size)
+                # print(zip_ref.namelist())
+                for file in zip_ref.infolist():
+                    # determine whether the current file matches the mode
+                    if mode == 'photos':
+                        is_valid = pattern.match(file.filename)
+                    elif mode == 'albums':
+                        is_valid = not pattern.match(file.filename)
+                    else:
+                        raise ValueError('mode must be either "photos" or "albums"')
+
+                    # extract file
+                    if is_valid:
+                        # remove the Takeout/Google Photos part from the target directory
+                        file.filename = os.path.relpath(
+                            file.filename, 'Takeout/Google Photos')
+                        zip_ref.extract(file, os.path.join(
+                            photos_dir, mode.title()))
+                    progress.update(unzipping_task, advance=file.file_size)
+                    progress.update(archives_task, advance=file.file_size)
 
 
 def _clean_up(takeout_dir, photos_dir, delete_archives=False):
@@ -83,9 +95,7 @@ def _clean_up(takeout_dir, photos_dir, delete_archives=False):
 
 
 def organize_photos_takeout(takeout_dir: str, photos_dir: str):
-    print('Unzipping photos')
     _unzip_photos(takeout_dir, photos_dir, 'photos')
-    print('Unzipping albums')
     _unzip_photos(takeout_dir, photos_dir, 'albums')
 
     # Clean up.
