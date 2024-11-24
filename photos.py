@@ -33,7 +33,7 @@ def _unzip_photos(takeout_dir, photos_dir, mode='photos'):
     `mode` can be either 'photos' (default) or 'albums'. The former extracts the dated folders, the
     latter the rest, assuming they are all albums.
     """
-    pattern = re.compile(r'^Takeout/Google Photos/\d{4}-[01]\d-[0-3]\d.*')
+    pattern = re.compile(r'^Takeout/Google Photos/Photos from \d{4}')
 
     for archive in _list_takeout_archives(takeout_dir):
         print('unzipping: ', archive)
